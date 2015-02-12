@@ -140,12 +140,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
+         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
         }
@@ -165,7 +160,6 @@ public class MainActivity extends ActionBarActivity {
                     TimeUnit.SECONDS.sleep(2);
                     // установлено
                     h.sendEmptyMessage(STATUS_CONNECTED);
-// выполняется какая-то работа
                     TimeUnit.SECONDS.sleep(3);
                     int filesCount = rand.nextInt(5);
                     if (filesCount == 0) {
@@ -176,20 +170,14 @@ public class MainActivity extends ActionBarActivity {
                         h.sendEmptyMessage(STATUS_NONE);
                         return;
                     }
-// загрузка начинается
-// создаем сообщение, с информацией о количестве файлов
+// загрузка начинается создаем сообщение, с информацией о количестве файлов
                     m = h.obtainMessage(STATUS_DOWNLOAD_START, filesCount, 0);
-// отправляем
                     h.sendMessage(m);
                     for (int i = 1; i <= filesCount; i++) {
 // загружается файл
                         file = downloadFile();
-// создаем сообщение с информацией о порядковом номере
-// файла,
-// кол-вом оставшихся и самим файлом
-                        m = h.obtainMessage(STATUS_DOWNLOAD_FILE, i,
-                                filesCount - i, file);
-// отправляем
+// создаем сообщение с информацией о порядковом номере файла,кол-вом оставшихся и самим файлом
+                        m = h.obtainMessage(STATUS_DOWNLOAD_FILE, i, filesCount - i, file);
                         h.sendMessage(m);
                     }
 // загрузка завершена
