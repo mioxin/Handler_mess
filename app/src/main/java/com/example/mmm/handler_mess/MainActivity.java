@@ -4,10 +4,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -17,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends ActionBarActivity {
     final String LOG_TAG = "myLogs";
+    final int max = 100;
+    int cnt;
     final int STATUS_NONE = 0; // нет подключения
     final int STATUS_CONNECTING = 1; // подключаемся
     final int STATUS_CONNECTED = 2; // подключено
@@ -28,6 +33,7 @@ public class MainActivity extends ActionBarActivity {
     TextView tv;
     ProgressBar pbbar;
     Button but_con;
+    CheckBox cb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,7 @@ public class MainActivity extends ActionBarActivity {
         tv = (TextView)findViewById(R.id.tv);
         pbbar = (ProgressBar) findViewById(R.id.pbbar);
         but_con = (Button) findViewById(R.id.but_con);
+        cb = (CheckBox) findViewById(R.id.cb);
 
         h = new Handler() {
             public void handleMessage(Message msg){
@@ -76,7 +83,52 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         h.sendEmptyMessage(STATUS_NONE);
+
+        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    tv.setVisibility(View.VISIBLE);
+                    h.post(showinfo);
+                } else{
+                    tv.setVisibility(View.GONE);
+                    h.removeCallbacks(showinfo);
+                }
+            }
+        });
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for (cnt=1; cnt<max; cnt++){
+                        TimeUnit.MILLISECONDS.sleep(100);
+                        h.post(updateprogress);
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
     }
+
+    Runnable showinfo = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(LOG_TAG, "showinfo");
+            tv.setText("Count = " + cnt);
+            h.postDelayed(showinfo, 1000);
+        }
+    };
+
+    Runnable updateprogress = new Runnable() {
+        @Override
+        public void run() {
+            pbbar.setProgress(cnt);
+        }
+    };
 
 
     @Override
